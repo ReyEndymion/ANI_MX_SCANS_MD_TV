@@ -21,7 +21,7 @@ import { makeWASocket, protoType, serialize } from './lib/simple.js';
 import { Low, JSONFile } from 'lowdb';
 import { mongoDB, mongoDBV2 } from './lib/mongoDB.js';
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
-const { DisconnectReason, useMultiFileAuthState } = await import('@reyendymion/ww_websocket_conection')
+const { DisconnectReason, useMultiFileAuthState } = await import('@whiskeysockets/baileys')
 const { CONNECTING } = ws
 const { chain } = lodash
 const PORT = process.env.PORT || process.env.SERVER_PORT || 3000
