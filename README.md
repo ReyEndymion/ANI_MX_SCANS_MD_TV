@@ -64,7 +64,7 @@ ESCRIBE LOS SIGUIENTES COMANDOS UNO POR UNO:
 ```
 
 ## `EDITOR Y PORPIETARIO DEL BOT` 
-[![ReyEndymion](https://avatars.githubusercontent.com/u/90165013?s=400&u=946f5c00c527c7e6fa2ef5148c6ad56270bb600e&v=4size=100)](https://github.com/ReyEndymion/) 
+[![ReyEndymion](https://avatars.githubusercontent.com/u/33460024?s=400&u=606a55df86c01cff7351ac68806cae5f8719825b&v=4)](https://github.com/ReyEndymion/) 
 
 `ANI MX SCANS version termux __________ By Rey Endymion`
 
