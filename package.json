@@ -1,5 +1,5 @@
 {
-  "name": "ani_mx_scans-md",
+  "name": "ani_mx_scans_md_tv",
   "version": "1.2.0",
   "description": "Bot promocional del proyecto ??ANI MX SCANS??",
   "main": "index.js",
@@ -22,10 +22,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ReyEndymion/ANI_MX_SCANS-MD.git"
+    "url": "git+https://github.com/ReyEndymion/ANI_MX_SCANS_MD_TV.git"
   },
   "bugs": {
-    "url": "https://github.com/ReyEndymion/ANI_MX_SCANS-MD/issues"
+    "url": "https://github.com/ReyEndymion/ANI_MX_SCANS_MD_TV/issues"
   },
   "license": "GPL-3.0-or-later",
   "dependencies": {
