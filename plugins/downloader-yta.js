@@ -1,4 +1,4 @@
-import { youtubedl, youtubedlv2, youtubedlv3 } from '@bochilteam/scraper'
+import { youtubedl, youtubedlv2 } from '@bochilteam/scraper'
 import fetch from 'node-fetch'
 let handler = async (m, { conn, args }) => {
 if (!args[0]) throw '*[❗INFO❗] INSERTE EL COMANDO MAS EL ENLACE / LINK DE UN VIDEO DE YOUTUBE*'
@@ -6,7 +6,7 @@ await m.reply(`*_⏳SE ESTA PROCESANDO SU AUDIO...⏳_*\n\n*◉ SI SU AUDIO NO E
 try {
 let q = '128kbps'
 let v = args[0]
-const yt = await youtubedl(v).catch(async _ => await youtubedlv2(v)).catch(async _ => await youtubedlv3(v))
+const yt = await youtubedl(v).catch(async _ => await youtubedlv2(v))
 const dl_url = await yt.audio[q].download()
 const ttl = await yt.title
 const size = await yt.audio[q].fileSizeH
@@ -32,9 +32,9 @@ if (!args || !args[0]) throw `*[❗INFO❗] INSERTE EL COMANDO MAS EL ENLACE / L
 conn.reply(m.chat, `*_⏳SE ESTA PROCESANDO SU AUDIO...⏳_*\n\n*◉ SI SU AUDIO NO Es ENVIADO, PRUEBE CON EL COMANDO #playdoc O #play.1 O #ytmp3doc ◉*`, m, {
 contextInfo: { externalAdReply :{ mediaUrl: null, mediaType: 1, description: null, 
 title: 'REPRODUCTOR DE AUDIO',
-body: ' BY 🌎ANI MX SCANS🌏',         
+body: wm,         
 previewType: 0, thumbnail: fs.readFileSync("./Menu2.jpg"),
-sourceUrl: `https://www.facebook.com/ANIMxSCANS`}}})
+sourceUrl: hp_otkstogthr}}})
 let chat = global.db.data.chats[m.chat]
 const isY = /y(es)/gi.test(args[1])
 const { thumbnail, audio: _audio, title } = await youtubedl(args[0]).catch(async _ => await youtubedlv2(args[0])).catch(async _ => await youtubedlv3(args[0]))

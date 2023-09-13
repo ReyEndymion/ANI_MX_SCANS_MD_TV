@@ -1,6 +1,6 @@
 const toxicRegex = /puto|puta|rata|estupido|imbecil|rctmre|mrd|verga|vrga|maricon/i
 
-export async function before(m, { isAdmin, isBotAdmin, isOwner }) {
+export async function before(m, {conn, isAdmin, isBotAdmin, isOwner }) {
     if (m.isBaileys && m.fromMe)
         return !0
     if (!m.isGroup)
@@ -20,7 +20,6 @@ export async function before(m, { isAdmin, isBotAdmin, isOwner }) {
            await new Promise(resolve => setTimeout(resolve, 5));
            txt += c;
            count++;
-       
            if (count % 10 === 0) {
                conn.sendPresenceUpdate('composing' , m.chat);
            }

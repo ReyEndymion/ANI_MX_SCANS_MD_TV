@@ -1,4 +1,3 @@
-
 import { youtubeSearch } from '@bochilteam/scraper'
 import fetch from 'node-fetch'
 let confirmations = {}
@@ -6,6 +5,7 @@ async function handler(m, { conn, command, text, usedPrefix })  {
 if (!text) throw `*[❗INFO❗] NOMBRE DE LA CANCION FALTANTE, POR FAVOR INGRESE EL COMANDO MAS EL NOMBRE/TITULO DE UNA CANCION*\n\n*—◉ EJEMPLO:*\n*${usedPrefix + command} Good Feeling - Flo Rida*`
 try {
 let vid = (await youtubeSearch(text)).video[0]
+console.log('lastimosamente:', text)
 if (!vid) throw '*[❗INFO❗] LO SIENTO, NO PUDE ENCONTRAR EL AUDIO/VIDEO, INTENTE CON OTRO NOMBRE/TITULO*'
 let { title, description, thumbnail, videoId, durationH, viewH, publishedTime } = vid
 const urll = 'https://www.youtube.com/watch?v=' + videoId
@@ -30,7 +30,7 @@ confirmations[m.sender] = {
     timeout: setTimeout(() => (m.reply('Se acabó el tiempo'), delete confirmations[m.sender]), 60 * 1000)
 }
 } catch {
-try {
+try {/*
 let vid2 = await (await fetch(`https://api.lolhuman.xyz/api/ytsearch?apikey=${lolkeysapi}&query=${text}`)).json()
 let { videoId, title, views, published, thumbnail, timestamp } = await vid2.result[0]
 const url = 'https://www.youtube.com/watch?v=' + videoId
@@ -41,7 +41,7 @@ let capt = `❏ 📌 *TITULO:* ${title}\n❏ 📆 *PUBLICADO:* ${published}\n❏
 const buttons = [{buttonId: `#playlist ${title}`, buttonText: {displayText: '📋 MAS RESULTADOS 📋'}, type: 1}]
 const buttonMessage = { image: {url: thumbnail}, caption: capt, footer: '*ENVIANDO AUDIO, AGUARDE UN MOMENTO...*', buttons: buttons, headerType: 4 }
 let msg = await conn.sendMessage(m.chat, buttonMessage, { quoted: m })
-//conn.sendMessage(m.chat, { audio: { url: aud }, mimetype: 'audio/mp4', fileName: `${title}.mp3`}, {quoted: msg})
+//conn.sendMessage(m.chat, { audio: { url: aud }, mimetype: 'audio/mp4', fileName: `${title}.mp3`}, {quoted: msg})*/
 } catch {  
 throw '*[❗INFO❗] ERROR, POR FAVOR VUELVA A INTENTARLO*'}}
 }
