@@ -30,6 +30,15 @@ ESCRIBE LOS SIGUIENTES COMANDOS UNO POR UNO:
  npm update
  npm start
 ```
+### `—◉ 👾 ACTIVAR EN USERLAND 👾`
+
+ `Userland es el cliente para android para instalar sistemas operativos dentro de android con mejores permisos y la posibilidad de transmitir su terminal via ssh y transferir archivos via ftp y scp para sincronizar archivos y aunquye en termux tambien se puede hacer a traez de uso de varias apks, aca les dejo la posibilidad de hacerlo desde userland sin ninguna apk mas`
+
+ ```Requisitos minimos:
+ - 4GB de espacio en el dispositivo
+ - 1gb de memoria RAM (va muy lento, se requieren 2GB)
+ - android 8 (probado) en adelante
+ ```
 
 ### `—◉ ✔️ ACTIVAR EN CASO DE DETENERSE ✔️`
 ```bash
@@ -67,4 +76,3 @@ ESCRIBE LOS SIGUIENTES COMANDOS UNO POR UNO:
 [![ReyEndymion](https://avatars.githubusercontent.com/u/33460024?s=400&u=606a55df86c01cff7351ac68806cae5f8719825b&v=4size=100)](https://github.com/ReyEndymion/) 
 
 `ANI MX SCANS version termux __________ By Rey Endymion`
-
