@@ -78,8 +78,8 @@ const connectionOptions = {
 logger: P({ level: 'silent' }),
 printQRInTerminal: true,
 auth: state,
-browser: ['🌎ANI MX SCANS🌏','Safari','16.3.1'],
-
+browser: ['Ubuntu','Chrome','20.0.4'],
+//🌎ANI MX SCANS🌏
 }
 
 global.conn = makeWASocket(connectionOptions)
@@ -101,95 +101,6 @@ if (opts['server']) (await import('./server.js')).default(global.conn, PORT);
   const SESSION_DIR = authFile;
   const SESSION_BACKUP_DIR = authFileRespald;
   const CREDENTIALS_FILE = 'creds.json';
-  const CREDENTIALS_BACKUP_FILE = 'creds.json';
-  
-function backupCreds() {
-const credsFilePath = path.join(SESSION_DIR, CREDENTIALS_FILE);
-  const backupFilePath = path.join(SESSION_BACKUP_DIR, CREDENTIALS_BACKUP_FILE);
-  
-
-  copyFileSync(credsFilePath, backupFilePath);
-  console.log(`Creado el archivo de respaldo: ${backupFilePath}`);
-
-}
- 
-function actualizarNumero() {
-  const configPath = path.join(dirP, 'config.js');
-  const configData = readFileSync(configPath, 'utf8');
-    const archivoCreds = readFileSync(path.join(dirP, 'sesionRespaldo/creds.json'));
-    const numero = JSON.parse(archivoCreds).me.id.split(':')[0];
-  const updatedGlobalAni = configData.replace(/(global\.animxscans\s*=\s*\[\s*\[')[0-9]+'(,\s*'Bot principal\s*-\s*ANI MX SCANS',\s*'ANI MX SCANS'\]\s*\])/, function(match) {
-    return `global.animxscans = [['${numero}', 'Bot principal - ANI MX SCANS', 'ANI MX SCANS']]`;
-  });
-  const updateSerbotOfc = configData.replace(/(global\.serbot\s*=\s*`https:\/\/api\.whatsapp\.com\/send\/\?phone=)[0-9]+(&text=.serbot&type=phone_number&app_absent=0`)/, function(match) {
-    return `global.serbot = 'https://api.whatsapp.com/send/?phone=${numero}&text=.serbot&type=phone_number&app_absent=0'`
-  
-  });
-  writeFileSync(configPath, updatedGlobalAni && updateSerbotOfc);
-}
-
-function cleanupOnConnectionError() {
-
-  readdirSync(SESSION_DIR).forEach(file => {
-    const filePath = path.join(SESSION_DIR, file);
-    try {
-      unlinkSync(filePath);
-      console.log(`Archivo eliminado: ${filePath}`);
-    } catch (error) {
-      console.log(`No se pudo eliminar el archivo: ${filePath}`);
-    }
-  });
-
-  const backupFilePath = path.join(SESSION_BACKUP_DIR, CREDENTIALS_BACKUP_FILE);
-  try {
-    unlinkSync(backupFilePath);
-    console.log(`Archivo de copia de seguridad eliminado: ${backupFilePath}`);
-  } catch (error) {
-    console.log(`No se pudo eliminar el archivo de copia de seguridad o no existe: ${backupFilePath}`);
-  }
-  process.send('reset')
-} 
-
-function credsStatus() {
-
-  const credsFilePath = path.join(SESSION_DIR, CREDENTIALS_FILE);
-  const backupFilePath = path.join(SESSION_BACKUP_DIR, CREDENTIALS_BACKUP_FILE);
-  
-  let originalFileValid = false;
-  try {
-    const stats = statSync(credsFilePath);
-    originalFileValid = stats.isFile() && stats.size > 0;
-  } catch (error) {
-    console.log(`El archivo de credenciales no existe o está vacío. Generando código QR...`);
-    connectionOptions
-      console.log(`Escanea el código QR para continuar.`);
-  }
-  
-  if (!originalFileValid) {
-    const backupStats = statSync(backupFilePath);
-    if (backupStats.isFile() && backupStats.size > 0) {
-      copyFileSync(backupFilePath, credsFilePath);
-      console.log(`Archivo de credenciales restaurado desde la copia de seguridad: ${backupFilePath} -> ${credsFilePath}`);
-        process.send('reset')
-    } else {
-      console.log(`No se encuentra el archivo de credenciales válido y el archivo de copia de seguridad no es válido o falta: ${credsFilePath}, ${backupFilePath}`);
-      connectionOptions
-    }
-  } else {
-    console.log('Archivo de respaldo correcto, continuando inicio de sesión');
-  }
-}
-
-function waitTwoMinutes() {
-  return new Promise(resolve => {
-    setTimeout(() => {
-      resolve();
-    }, 2 * 60 * 1000); 
-  });
-}
-function wait(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
 
 const MAX_CLOSE_COUNT = 10;
 const CLOSE_CHECK_INTERVAL = 5 * 60 * 1000; // 5 minutes
@@ -223,46 +134,46 @@ if (connection === undefined) {
   return;
 
 }
-let reason = new Boom(lastDisconnect?.error)?.output?.statusCode;
 if (connection == 'close') {
-    if (reason === DisconnectReason.badSession) {
+    if (code === DisconnectReason.badSession) {
         conn.logger.error(`[ ⚠ ] Sesión incorrecta, por favor elimina la carpeta ${global.authFile} y escanea nuevamente.`);
         cleanupOnConnectionError()
         //process.exit();
-    } else if (reason === DisconnectReason.preconditionRequired){
+    } else if (code === DisconnectReason.preconditionRequired){
       conn.logger.warn(`[ ⚠ ] Conexión cerrada, reconectando por precondicion...`);
       global.reloadHandler(true).catch(console.error)
       return
-    } else if (reason === DisconnectReason.connectionClosed) {
+    } else if (code === DisconnectReason.connectionClosed) {
         conn.logger.warn(`[ ⚠ ] Conexión cerrada, reconectando...`);
         global.reloadHandler(true).catch(console.error)
         return
         //process.send('reset');
-    } else if (reason === DisconnectReason.connectionLost) {
+    } else if (code === DisconnectReason.connectionLost) {
         conn.logger.warn(`[ ⚠ ] Conexión perdida con el servidor, reconectando...`);
         global.reloadHandler(true).catch(console.error)
         return
        // process.send('reset');
-    } else if (reason === DisconnectReason.connectionReplaced) {
+    } else if (code === DisconnectReason.connectionReplaced) {
         conn.logger.error(`[ ⚠ ] Conexión reemplazada, se ha abierto otra nueva sesión. Por favor, cierra la sesión actual primero.`);
         //process.exit();
-    } else if (reason === DisconnectReason.loggedOut) {
+    } else if (code === DisconnectReason.loggedOut) {
         conn.logger.error(`[ ⚠ ] Conexion cerrada, por favor elimina la carpeta ${global.authFile} y escanea nuevamente.`);
         cleanupOnConnectionError()
         //process.exit();
-    } else if (reason === DisconnectReason.restartRequired) {
+    } else if (code === DisconnectReason.restartRequired) {
         conn.logger.info(`[ ⚠ ] Reinicio necesario, reinicie el servidor si presenta algún problema.`);
+        global.reloadHandler(true).catch(console.error)
         //process.send('reset');
-    } else if (reason === DisconnectReason.timedOut) {
+    } else if (code === DisconnectReason.timedOut) {
         conn.logger.warn(`[ ⚠ ] Tiempo de conexión agotado, reconectando...`);
         process.send('reset');
-    } else if (reason === 403) {
-      conn.logger.warn(`[ ⚠ ] Razón de desconexión revisión de whatsapp o soporte. ${reason || ''}: ${connection || ''}`);
+    } else if (code === 403) {
+      conn.logger.warn(`[ ⚠ ] Razón de desconexión revisión de whatsapp o soporte. ${code || ''}: ${connection || ''}`);
       cleanupOnConnectionError()
     } else if (code === 503){
       global.reloadHandler(true).catch(console.error)
     } else {
-        conn.logger.warn(`[ ⚠ ] Razón de desconexión desconocida. ${reason || ''}: ${connection || ''}`);
+        conn.logger.warn(`[ ⚠ ] Razón de desconexión desconocida. ${code || ''}: ${connection || ''}`);
         //process.exit();
           consecutiveCloseCount++;
       console.log(chalk.yellow(`🚩ㅤConexion cerrada, por favor borre la carpeta ${global.authFile} y reescanee el codigo QR`));
@@ -274,15 +185,15 @@ if (connection == 'close') {
       } else {
         await wait(CLOSE_CHECK_INTERVAL);
       }
-    }
-if (connection == 'open') {
-console.log(chalk.yellow('▣─────────────────────────────···\n│\n│❧ CONECTADO CORRECTAMENTE AL WHATSAPP ✅\n│\n▣─────────────────────────────···'))
 backupCreds() 
 actualizarNumero() 
 credsStatus() 
+    }
+if (connection == 'open') {
+console.log(chalk.yellow('▣─────────────────────────────···\n│\n│❧ CONECTADO CORRECTAMENTE AL WHATSAPP ✅\n│\n▣─────────────────────────────···'))
 if (update.receivedPendingNotifications) { 
   waitTwoMinutes()
-  return conn.groupAcceptInvite('HbC4vaYsvYi0Q3i38diybA');
+  //return conn.groupAcceptInvite('HbC4vaYsvYi0Q3i38diybA');
 }
 }
 return;
@@ -290,6 +201,7 @@ return;
 
 process.on('uncaughtException', console.error);
 
+console.log('conn: ', conn)
 let isInit = true;
 let handler = await import('./handler.js');
 global.reloadHandler = async function(restatConn) {
@@ -408,6 +320,93 @@ let s = global.support = { ffmpeg, ffprobe, ffmpegWebp, convert, magick, gm, fin
 Object.freeze(global.support)
 }
 
+function backupCreds() {
+const credsFilePath = path.join(SESSION_DIR, CREDENTIALS_FILE);
+  const backupFilePath = path.join(SESSION_BACKUP_DIR, CREDENTIALS_FILE);
+  
+
+  copyFileSync(credsFilePath, backupFilePath);
+  console.log(`Creado el archivo de respaldo: ${backupFilePath}`);
+
+}
+ 
+function actualizarNumero() {
+  const configPath = path.join(dirP, 'config.js');
+  const configData = readFileSync(configPath, 'utf8');
+    const archivoCreds = readFileSync(path.join(dirP, 'sesionRespaldo/creds.json'));
+    const numero = JSON.parse(archivoCreds).me.id.split(':')[0];
+  const updatedGlobalAni = configData.replace(/(global\.animxscans\s*=\s*\[\s*\[')[0-9]+'(,\s*'Bot principal\s*-\s*ANI MX SCANS',\s*'ANI MX SCANS'\]\s*\])/, function(match) {
+    return `global.animxscans = [['${numero}', 'Bot principal - ANI MX SCANS', 'ANI MX SCANS']]`;
+  });
+  const updateSerbotOfc = configData.replace(/(global\.serbot\s*=\s*`https:\/\/api\.whatsapp\.com\/send\/\?phone=)[0-9]+(&text=.serbot&type=phone_number&app_absent=0`)/, function(match) {
+    return `global.serbot = 'https://api.whatsapp.com/send/?phone=${numero}&text=.serbot&type=phone_number&app_absent=0'`
+  
+  });
+  writeFileSync(configPath, updatedGlobalAni && updateSerbotOfc);
+}
+
+function cleanupOnConnectionError() {
+
+  readdirSync(SESSION_DIR).forEach(file => {
+    const filePath = path.join(SESSION_DIR, file);
+    try {
+      unlinkSync(filePath);
+      console.log(`Archivo eliminado: ${filePath}`);
+    } catch (error) {
+      console.log(`No se pudo eliminar el archivo: ${filePath}`);
+    }
+  });
+
+  const backupFilePath = path.join(SESSION_BACKUP_DIR, CREDENTIALS_FILE);
+  try {
+    unlinkSync(backupFilePath);
+    console.log(`Archivo de copia de seguridad eliminado: ${backupFilePath}`);
+  } catch (error) {
+    console.log(`No se pudo eliminar el archivo de copia de seguridad o no existe: ${backupFilePath}`);
+  }
+  process.send('reset')
+} 
+
+function credsStatus() {
+
+  const credsFilePath = path.join(SESSION_DIR, CREDENTIALS_FILE);
+  const backupFilePath = path.join(SESSION_BACKUP_DIR, CREDENTIALS_FILE);
+  
+  let originalFileValid = false;
+  try {
+    const stats = statSync(credsFilePath);
+    originalFileValid = stats.isFile() && stats.size > 0;
+  } catch (error) {
+    console.log(`El archivo de credenciales no existe o está vacío. Generando código QR...`);
+    connectionOptions
+      console.log(`Escanea el código QR para continuar.`);
+  }
+  
+  if (!originalFileValid) {
+    const backupStats = statSync(backupFilePath);
+    if (backupStats.isFile() && backupStats.size > 0) {
+      copyFileSync(backupFilePath, credsFilePath);
+      console.log(`Archivo de credenciales restaurado desde la copia de seguridad: ${backupFilePath} -> ${credsFilePath}`);
+        process.send('reset')
+    } else {
+      console.log(`No se encuentra el archivo de credenciales válido y el archivo de copia de seguridad no es válido o falta: ${credsFilePath}, ${backupFilePath}`);
+      connectionOptions
+    }
+  } else {
+    console.log('Archivo de respaldo correcto, continuando inicio de sesión');
+  }
+}
+
+function waitTwoMinutes() {
+  return new Promise(resolve => {
+    setTimeout(() => {
+      resolve();
+    }, 2 * 60 * 1000); 
+  });
+}
+function wait(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
 function clearTmp() {
   const tmp = [join(__dirname, 'tmp')]
   const filename = []
@@ -509,10 +508,6 @@ function clearTmp() {
       });
     }
 
-setInterval(async () => {
-    backupCreds()
-    console.log(chalk.whiteBright(`\n▣────────[ BACKUP_CREDS ]───────────···\n│\n▣─❧ RESPALDO EXITOSO ✅\n│\n▣────────────────────────────────────···\n`))
-    }, 15 * 60 * 1000)
 setInterval(async () => {
     clearTmp()
     console.log(chalk.cyanBright(`\n▣────────[ AUTOCLEARTMP ]───────────···\n│\n▣─❧ ARCHIVOS ELIMINADOS ✅\n│\n▣────────────────────────────────────···\n`))

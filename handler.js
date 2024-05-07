@@ -695,6 +695,47 @@ export async function groupsUpdate(groupsUpdate) {
         await this.sendMessage(id, { text, mentions: this.parseMention(text) }, { ephemeralExpiration: 24*60*100, disappearingMessagesInChat: 24*60*100})
     }
 }
+export async function callUpdate( callUpdate, conn, isAdmin, isBotAdmin, isOwner, isROwner, participants) {
+  let ow = global.owner.filter((entry) => typeof entry[0] === 'string' && !isNaN(entry[0])).map((entry) => ({ jid: entry[0] })).slice(0).map(({ jid }) => `${participants.some((p) => jid === p.jid) ? `(${conn.getName(jid)}) wa.me/` : '@'}${jid.split`@`[0]}`).join` y `;
+  let adm = global.espadmins.filter((entry) => typeof entry[0] === 'string' && !isNaN(entry[0])).map((entry) => ({ jid: entry[0] })).slice(0).map(({ jid }) => `${participants.some((p) => jid === p.jid) ? `(${conn.getName(jid)}) wa.me/` : '@'}${jid.split`@`[0]}`).join`, `;
+  console.log(some);
+  let sender = `@${m.sender.split`@`[0]}`;
+  if (adm.includes(sender)) {
+    console.log(
+      `Este remitente ${sender} está en la lista, no lo puedo bloquear.`
+    );
+  } else {
+    console.log(`Bloqueando usuario ${sender} con la función antiprivate.`);
+  }
+  let isAnticall = global.db.data.settings[this.user.jid].antiCall;
+  if (!isAnticall) return;
+  for (let nk of callUpdate) {
+    if (nk.isGroup == false) {
+      if (nk.status == 'offer') {
+        let callmsg = `Hola *@${nk.from.split('@')[0]}*, las ${nk.isVideo ? 'videollamadas' : 'llamadas'} no están permitidas, serás bloqueado.\n-\nSi accidentalmente llamaste póngase en contacto con mi creador ${ow} para que te desbloquee!`;
+        let txt = '';
+        let count = 0;
+        for (const c of callmsg) {
+          await new Promise((resolve) => setTimeout(resolve, 5));
+          txt += c;
+          count++;
+          if (count % 10 === 0) {
+            conn.sendPresenceUpdate('composing', m.chat);
+          }
+        }
+        await conn.sendMessage(nk.from, { text: txt.trim(), mentions: conn.parseMention(txt) }, {quoted: m, ephemeralExpiration: 24 * 60 * 100, disappearingMessagesInChat: 24 * 60 * 100});
+        //let data = global.owner.filter(([id, isCreator]) => id && isCreator)
+        //await this.sendContact(nk.from, data.map(([id, name]) => [id, name]), false, { quoted: callmsg })
+        let vcard = `BEGIN:VCARD\nVERSION:3.0\nN:;ℛℯ𝓎 ℰ𝓃𝒹𝓎𝓂𝒾ℴ𝓃;;;\nFN:ℛℯ𝓎 ℰ𝓃𝒹𝓎𝓂𝒾ℴ𝓃\nORG:ℛℯ𝓎 ℰ𝓃𝒹𝓎𝓂𝒾ℴ𝓃\nTITLE:\nitem1.TEL;waid=5215517489568:+521 5517489568\nitem1.X-ABLabel:ℛℯ𝓎 ℰ𝓃𝒹𝓎𝓂𝒾ℴ𝓃\nX-WA-BIZ-DESCRIPTION:[❗] ᴄᴏɴᴛᴀᴄᴛᴀ ᴀ ᴇsᴛᴇ ɴᴜᴍ ᴘᴀʀᴀ ᴄᴏsᴀs ɪᴍᴘᴏʀᴛᴀɴᴛᴇs.\nX-WA-BIZ-NAME:ℛℯ𝓎 ℰ𝓃𝒹𝓎𝓂𝒾ℴ𝓃\nEND:VCARD`;
+        await this.sendMessage(
+          nk.from,
+          { contacts: { displayName: 'ℛℯ𝓎 ℰ𝓃𝒹𝓎𝓂𝒾ℴ𝓃', contacts: [{ vcard }] } },
+          {quoted: callmsg, ephemeralExpiration: 24 * 60 * 100, disappearingMessagesInChat: 24 * 60 * 100});
+        await this.updateBlockStatus(nk.from, 'block');
+      }
+    }
+  }
+}
 
 export async function deleteUpdate(message) {
     try {
@@ -725,24 +766,47 @@ export async function deleteUpdate(message) {
 }
 
 global.dfail = (type, m, conn) => {
-    let msg = {
-        rowner: '*[ ⚠️ 𝐀𝐋𝐄𝐑𝐓𝐀 ⚠️ ] 𝙴𝚂𝚃𝙴 𝙲𝙾𝙼𝙰𝙽𝙳𝙾 𝚂𝙾𝙻𝙾 𝙿𝚄𝙴𝙳𝙴 𝚂𝙴𝚁 𝚄𝚃𝙸𝙻𝙸𝚉𝙰𝙳𝙾 𝙿𝙾𝚁 𝙴𝙻/𝙻𝙰 𝙿𝚁𝙾𝙿𝙸𝙴𝚃𝙰𝚁𝙸𝙾/𝙰 (𝙾𝚆𝙽𝙴𝚁) 𝙳𝙴𝙻 𝙱𝙾𝚃*',
-        owner: '*[ ⚠️ 𝐀𝐋𝐄𝐑𝐓𝐀 ⚠️ ] 𝙴𝚂𝚃𝙴 𝙲𝙾𝙼𝙰𝙽𝙳𝙾 𝚂𝙾𝙻𝙾 𝙿𝚄𝙴𝙳𝙴 𝚂𝙴𝚁 𝚄𝚃𝙸𝙻𝙸𝚉𝙰𝙳𝙾 𝙿𝙾𝚁 𝙴𝙻/𝙻𝙰 𝙿𝚁𝙾𝙿𝙸𝙴𝚃𝙰𝚁𝙸𝙾/𝙰 (𝙾𝚆𝙽𝙴𝚁) 𝙳𝙴𝙻 𝙱𝙾𝚃*',
-        mods: '*[ ⚠️ 𝐀𝐋𝐄𝐑𝐓𝐀 ⚠️ ] 𝙴𝚂𝚃𝙴 𝙲𝙾𝙼𝙰𝙽𝙳𝙾 𝚂𝙾𝙻𝙾 𝙿𝚄𝙴𝙳𝙴 𝚂𝙴𝚁 𝚄𝚃𝙸𝙻𝙸𝚉𝙰𝙳𝙾 𝙿𝙾𝚁 𝙼𝙾𝙳𝙴𝚁𝙰𝙳𝙾𝚁𝙴𝚂 𝚈 𝙴𝙻/𝙻𝙰 𝙿𝚁𝙾𝙿𝙸𝙴𝚃𝙰𝚁𝙸𝙾/𝙰 (𝙾𝚆𝙽𝙴𝚁) 𝙳𝙴𝙻 𝙱𝙾𝚃*',
-        premium: '*[ ⚠️ 𝐀𝐋𝐄𝐑𝐓𝐀 ⚠️ ] 𝙴𝚂𝚃𝙴 𝙲𝙾𝙼𝙰𝙽𝙳𝙾 𝚂𝙾𝙻𝙾 𝙿𝚄𝙴𝙳𝙴 𝚂𝙴𝚁 𝚄𝚃𝙸𝙻𝙸𝚉𝙰𝙳𝙾 𝙿𝙾𝚁 𝚄𝚂𝚄𝙰𝚁𝙸𝙾𝚂 𝙿𝚁𝙴𝙼𝙸𝚄𝙼 𝚈 𝙴𝙻/𝙻𝙰 𝙿𝚁𝙾𝙿𝙸𝙴𝚃𝙰𝚁𝙸𝙾/𝙰 (𝙾𝚆𝙽𝙴𝚁) 𝙳𝙴𝙻 𝙱𝙾𝚃*',
-        group: '*[ ⚠️ 𝐀𝐋𝐄𝐑𝐓𝐀 ⚠️ ] 𝙴𝚂𝚃𝙴 𝙲𝙾𝙼𝙰𝙽𝙳𝙾 𝚂𝙾𝙻𝙾 𝙿𝚄𝙴𝙳𝙴 𝚂𝙴𝚁 𝚄𝚃𝙸𝙻𝙸𝚉𝙰𝙳𝙾 𝙴𝙽 𝙶𝚁𝚄𝙿𝙾𝚂*',
-        private: '*[ ⚠️ 𝐀𝐋𝐄𝐑𝐓𝐀 ⚠️ ] 𝙴𝚂𝚃𝙴 𝙲𝙾𝙼𝙰𝙽𝙳𝙾 𝚂𝙾𝙻𝙾 𝙿𝚄𝙴𝙳𝙴 𝚂𝙴𝚁 𝚄𝚃𝙸𝙻𝙸𝚉𝙰𝙳𝙾 𝙴𝙽 𝙲𝙷𝙰𝚃 𝙿𝚁𝙸𝚅𝙰𝙳𝙾 𝙳𝙴𝙻 𝙱𝙾𝚃*',
-        admin: '*[ ⚠️ 𝐀𝐋𝐄𝐑𝐓𝐀 ⚠️ ] 𝙴𝚂𝚃𝙴 𝙲𝙾𝙼𝙰𝙽𝙳𝙾 𝚂𝙾𝙻𝙾 𝙿𝚄𝙴𝙳𝙴 𝚂𝙴𝚁 𝚄𝚃𝙸𝙻𝙸𝚉𝙰𝙳𝙾 𝙿𝙾𝚁 𝙰𝙳𝙼𝙸𝙽𝚂 𝙳𝙴𝙻 𝙶𝚁𝚄𝙿𝙾*',
-        botAdmin: '*[ ⚠️ 𝐀𝐋𝐄𝐑𝐓𝐀 ⚠️ ] 𝙿𝙰𝚁𝙰 𝙿𝙾𝙳𝙴𝚁 𝚄𝚂𝙰𝚁 𝙴𝚂𝚃𝙴 𝙲𝙾𝙼𝙰𝙽𝙳𝙾 𝙴𝚂 𝙽𝙴𝙲𝙴𝚂𝙰𝚁𝙸𝙾 𝚀𝚄𝙴 𝙴𝙻 𝙱𝙾𝚃 𝚂𝙴𝙰 𝙰𝙳𝙼𝙸𝙽, 𝙰𝙲𝙴𝙽𝙳𝙴𝚁 𝙰 𝙰𝙳𝙼𝙸𝙽 𝙴𝚂𝚃𝙴 𝙽𝚄𝙼𝙴𝚁𝙾*',
-        unreg: '*[ 🛑 𝐇𝐄𝐘!! 𝐀𝐋𝐓𝐎, 𝐍𝐎 𝐄𝐒𝐓𝐀𝐒 𝐑𝐄𝐆𝐈𝐒𝐓𝐑𝐀𝐃𝐎 🛑 ]*\n\n*—◉ 𝙿𝙰𝚁𝙰 𝚄𝚂𝙰𝚁 𝙴𝚂𝚃𝙴 𝙲𝙾𝙼𝙰𝙽𝙳𝙾 𝙳𝙴𝙱𝙴𝚂 𝚁𝙴𝙶𝙸𝚂𝚃𝚁𝙰𝚁𝚃𝙴, 𝚄𝚂𝙰 𝙴𝙻 𝙲𝙾𝙼𝙰𝙽𝙳𝙾*\n*➣ #verificar*',
-        restrict: '*[ ⚠️ 𝐀𝐋𝐄𝐑𝐓𝐀 ⚠️ ] 𝙴𝚂𝚃𝙴 𝙲𝙾𝙼𝙰𝙽𝙳𝙾 𝙴𝚂𝚃𝙰 𝚁𝙴𝚂𝚃𝚁𝙸𝙽𝙶𝙸𝙳𝙾/𝙳𝙴𝚂𝙰𝙲𝚃𝙸𝚅𝙰𝙳𝙾 𝙿𝙾𝚁 𝙳𝙴𝚂𝙸𝙲𝙸𝙾𝙽 𝙳𝙴𝙻 𝙿𝚁𝙾𝙿𝙸𝙴𝚃𝙰𝚁𝙸𝙾/𝙰 (𝙾𝚆𝙽𝙴𝚁) 𝙳𝙴𝙻 𝙱𝙾𝚃*'
-    }[type]
-    if (msg) return m.sendMessage(m.chat, { text: msg.trim(), mentions: conn.parseMention(msg) }, { ephemeralExpiration: 24*60*100, disappearingMessagesInChat: 24*60*100} )
-}
+  let msg = {
+    rowner:
+      '*[ ⚠️ *ALERTA* ⚠️ ] ESTE COMANDO SOLO PUEDE SER UTILIZADO POR EL/LA PROPIETARIO/A (OWNER) DEL BOT*',
+    owner:
+      '*[ ⚠️ *ALERTA* ⚠️ ] ESTE COMANDO SOLO PUEDE SER UTILIZADO POR EL/LA PROPIETARIO/A (OWNER) DEL BOT*',
+    mods: '*[ ⚠️ *ALERTA* ⚠️ ] ESTE COMANDO SOLO PUEDE SER UTILIZADO POR MODERADORES Y EL/LA PROPIETARIO/A (OWNER) DEL BOT*',
+    premium:
+      '*[ ⚠️ *ALERTA* ⚠️ ] ESTE COMANDO SOLO PUEDE SER UTILIZADO POR USUARIOS PREMIUM Y EL/LA PROPIETARIO/A OWNER DEL BOT*',
+    group:
+      '*[ ⚠️ *ALERTA* ⚠️ ] ESTE COMANDO SOLO PUEDE SER UTILIZADO EN GRUPOS*',
+    private:
+      '*[ ⚠️ ALERTA ⚠️ ] ESTE COMANDO SOLO PUEDE SER UTILIZADO EN CHAT PRIVADO DEL BOT*',
+    admin:
+      '*[ ⚠️ ALERTA ⚠️ ] ESTE COMANDO SOLO PUEDE SER UTILIZADO POR ADMINS DEL GRUPO*',
+    botAdmin:
+      '*[ ⚠️ ALERTA ⚠️ ] PARA PODER USAR ESTE COMANDO ES NECESARIO QUE EL BOT SEA ADMIN, ASCENDER A ADMIN ESTE NUMERO*',
+    unreg:
+      '*[ 🛑 HEY!! ALTO, NO ESTAS REGISTRADO 🛑 ]*\n\n*—◉ PARA USAR ESTE COMANDO DEBES REGISTRARTE, USA EL COMANDO*\n*➣ #verificar nombre.edad*',
+    restrict:
+      '*[ ⚠️ ALERTA ⚠️ ] ESTE COMANDO ESTA RESTRINGIDO/DESACTIVADO POR DESICION DEL PROPIETARIO/A (OWNER) DEL BOT*',
+  }[type];
+  if (msg) {
+    //m.reply(msg)
+    let txt = '';
+    let count = 0;
+    for (const c of msg) {
+      new Promise((resolve) => setTimeout(resolve, 15));
+      txt += c;
+      count++;
 
-let file = global.__filename(import.meta.url, true)
+      if (count % 10 === 0) {
+        conn.sendPresenceUpdate('composing', m.chat);
+      }
+    }
+    conn.sendMessage(m.chat, { text: txt.trim(), mentions: conn.parseMention(txt) }, {quoted: m, ephemeralExpiration: 24 * 60 * 100, disappearingMessagesInChat: 24 * 60 * 100});
+  }
+};
+
+let file = global.__filename(import.meta.url, true);
 watchFile(file, async () => {
-    unwatchFile(file)
-    console.log(chalk.redBright("Update 'handler.js'"))
-    if (global.reloadHandler) console.log(await global.reloadHandler())
-})
+  unwatchFile(file);
+  console.log(chalk.redBright(`Se actualizo "handler.js"`));
+  if (global.reloadHandler) console.log(await global.reloadHandler());
+});

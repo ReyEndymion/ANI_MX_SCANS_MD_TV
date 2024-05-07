@@ -55,6 +55,7 @@
     "fs": "^0.0.1-security",
     "hispamemes": "^1.0.7",
     "human-readable": "^0.2.1",
+    "hxz-api": "1.0.1",
     "imagemaker.js": "^2.0.4",
     "instagram-url-direct": "^1.0.13",
     "jsdom": "^19.0.0",
@@ -82,7 +83,6 @@
     "syntax-error": "^1.4.0",
     "terminal-image": "^2.0.0",
     "url-regex-safe": "^3.0.0",
-    "wa-sticker-formatter": "^4.3.2",
     "yargs": "^17.3.1",
     "yt-search": "^2.10.3",
     "ytdl-core": "^4.11.5"
